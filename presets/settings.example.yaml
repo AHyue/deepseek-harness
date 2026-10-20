@@ -1,0 +1,102 @@
+# DSH 多模型接入预设
+#
+# 用法：把本文件的 llm-pi-ai 段合并进 $DSH_HOME/settings.yaml
+# 密钥通过 apiKeyEnv 指定的环境变量传入，不要写在本文件里。
+#
+# 重要：
+#   1. models[].id 必须与服务商后台完全一致，DSH 不做任何名称转换。
+#   2. 对内置目录已有的 provider，只写 apiKeyEnv 即可；一旦写 models，
+#      内置的上下文窗口/模态/思考格式会被整体替换。
+#   3. 视觉模型需要显式声明 input: [text, image]。
+
+llm-pi-ai:
+  providers:
+    # ───────────────────────────────────────────────
+    # 国内 OpenAI 兼容网关
+    # ───────────────────────────────────────────────
+
+    siliconflow:
+      displayName: 硅基流动
+      api: openai-completions
+      baseURL: https://api.siliconflow.cn/v1
+      apiKeyEnv: SILICONFLOW_API_KEY
+      models:
+        # 模型 ID 以服务商后台为准，下面是占位示例
+        - id: deepseek-ai/DeepSeek-V3
+        - id: Qwen/Qwen2.5-72B-Instruct
+
+    dashscope:
+      displayName: 阿里云百炼（通义千问兼容模式）
+      api: openai-completions
+      baseURL: https://dashscope.aliyuncs.com/compatible-mode/v1
+      apiKeyEnv: DASHSCOPE_API_KEY
+      models:
+        - id: qwen-plus
+        - id: qwen-max
+        # 视觉模型：显式声明图像输入
+        - id: qwen-vl-max
+          input: [text, image]
+
+    ark:
+      displayName: 火山方舟
+      api: openai-completions
+      baseURL: https://ark.cn-beijing.volces.com/api/v3
+      apiKeyEnv: ARK_API_KEY
+      models:
+        # 方舟用「推理接入点 ID」（ep-xxxxxxxx），每个人不同，务必替换
+        - id: ep-请替换为你的接入点ID
+
+    # ───────────────────────────────────────────────
+    # 本地推理服务
+    # ───────────────────────────────────────────────
+
+    ollama:
+      displayName: Ollama（本地）
+      api: openai-completions
+      baseURL: http://127.0.0.1:11434/v1
+      apiKeyEnv: OLLAMA_API_KEY
+      models:
+        - id: qwen2.5:7b
+        - id: llama3.1:8b
+
+    lmstudio:
+      displayName: LM Studio（本地）
+      api: openai-completions
+      baseURL: http://127.0.0.1:1234/v1
+      apiKeyEnv: LMSTUDIO_API_KEY
+      models:
+        - id: 请替换为 LM Studio 里加载的模型名
+
+    vllm:
+      displayName: vLLM（自建）
+      api: openai-completions
+      baseURL: http://127.0.0.1:8000/v1
+      apiKeyEnv: VLLM_API_KEY
+      models:
+        - id: 请替换为 vLLM 启动时指定的 --served-model-name
+
+    # ───────────────────────────────────────────────
+    # 内置目录已有：只补密钥，最小覆盖（推荐写法）
+    # ───────────────────────────────────────────────
+    # 这类 provider 的 endpoint、协议、模型列表都由内置目录提供，
+    # 只写 apiKeyEnv 就够了。多写 baseURL/models 反而会丢细节。
+
+    openrouter:
+      apiKeyEnv: OPENROUTER_API_KEY
+
+    moonshotai-cn:
+      apiKeyEnv: MOONSHOT_API_KEY
+
+    zai-coding-cn:
+      apiKeyEnv: ZAI_API_KEY
+
+    # ───────────────────────────────────────────────
+    # 自定义 Anthropic 协议网关
+    # ───────────────────────────────────────────────
+    # my-anthropic-gateway:
+    #   displayName: 我的 Anthropic 网关
+    #   api: anthropic-messages
+    #   baseURL: https://example.com/anthropic
+    #   apiKeyEnv: MY_ANTHROPIC_KEY
+    #   models:
+    #     - id: claude-sonnet-4-5
